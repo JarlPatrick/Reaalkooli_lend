@@ -25,6 +25,7 @@ class Tracker(object):
 		self.rtty = None
 		self.SentenceCallback = None
 		self.ImageCallback = None
+		self.andmed = []
 
 	def _TransmitIfFree(self, Channel, PayloadID, ChannelName, ImagePacketsPerSentence):
 		if not Channel.is_sending():
@@ -56,13 +57,18 @@ class Tracker(object):
 						     "{:.5f}".format(position.lon),
 						     int(position.alt),
 						     position.sats,
-						     "{:.1f}".format(InternalTemperature)]
+						     "{:.2f}".format(InternalTemperature)]
+
+				self.andmed = fieldlist
 
 				if self.SentenceCallback:
 					fieldlist.append(self.SentenceCallback())
 
 				sentence = build_sentence(fieldlist)
 				print(sentence, end="")
+
+				f = open("log.txt", "a")
+				f.write(sentence)
 
 				# Send sentence
 				Channel.send_text(sentence)
@@ -187,8 +193,9 @@ def closefan():
         p.ChangeDutyCycle(7.5)
 
 def extra_telemetry():
-        tmp,pre,hum = bme280.readBME280All()
-        return "{:.2f}".format(tmp) + ',' + "{:.5f}".format(pre) + ',' + "{:.5f}".format(hum)
+	tmp,pre,hum = bme280.readBME280All()
+	print(MT.andmed[5])
+	return "{:.2f}".format(tmp) + ',' + "{:.5f}".format(pre) + ',' + "{:.5f}".format(hum)
 
 MT = Tracker()
 
