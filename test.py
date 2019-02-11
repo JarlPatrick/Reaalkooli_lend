@@ -67,7 +67,7 @@ class Tracker(object):
 				sentence = build_sentence(fieldlist)
 				print(sentence, end="")
 
-				f = open("log.txt", "a")
+				f = open("/home/pi/lend/log.txt", "a")
 				f.write(sentence)
 
 				# Send sentence
@@ -194,19 +194,19 @@ def closefan():
 
 def extra_telemetry():
 	tmp,pre,hum = bme280.readBME280All()
-	print(MT.andmed[5])
 	return "{:.2f}".format(tmp) + ',' + "{:.5f}".format(pre) + ',' + "{:.5f}".format(hum)
 
 MT = Tracker()
 
-MT.set_rtty(payload_id='Jarl', frequency=434.250, baud_rate=300)
+MT.set_rtty(payload_id='Reaalkool', frequency=434.250, baud_rate=300)
 
 MT.start()
 
 MT.set_sentence_callback(extra_telemetry)
 
 while True:
-        sleep(5)
-        openfan()
-        sleep(5)
-        closefan()
+	sleep(5)
+	if(MT.andmed[5] > 20000):
+		openfan()
+	else:
+		closefan()
